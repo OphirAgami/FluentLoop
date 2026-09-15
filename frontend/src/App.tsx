@@ -1,35 +1,29 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
+import { useEffect, useState } from 'react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+    // משתנה מצב (State) שישמור את ההודעה שנקבל מהשרת
+    const [message, setMessage] = useState<string>('Loading...')
 
-  return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    // useEffect רץ פעם אחת ברגע שהקומפוננטה עולה למסך
+    useEffect(() => {
+        fetch('http://localhost:8000')
+            .then(response => response.json())
+            .then(data => setMessage(data.message))
+            .catch(error => console.error('Error fetching data:', error))
+    }, [])
+
+    return (
+        <div className="App">
+            <h1>Welcome to FluentLoop</h1>
+            <div className="card" style={{ padding: '2em', backgroundColor: '#1a1a1a', borderRadius: '8px' }}>
+                <h3>Message from Python Backend:</h3>
+                <p style={{ color: '#646cff', fontSize: '1.2em', fontWeight: 'bold' }}>
+                    {message}
+                </p>
+            </div>
+        </div>
+    )
 }
 
 export default App
