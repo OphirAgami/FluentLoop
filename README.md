@@ -1,37 +1,110 @@
-# 🗣️ FluentLoop (In Development)
+# 🗣️ FluentLoop
 
-**AI-Driven, Gamified English Speaking Platform (CEFR A1-C2)**
+**From unfamiliar words and recurring mistakes to targeted English speaking practice.**
 
-> *Note: This project is currently under active development as part of my 2026/2027 portfolio.*
+> In development. Current milestone: a React/TypeScript client connected to a Python/FastAPI backend.
 
-## 📖 Overview
-FluentLoop redefines language acquisition by bridging the gap between discovering new vocabulary and mastering active, real-world speech. Unlike traditional apps that rely on passive memorization and fleeting corrections, FluentLoop transforms completely unfamiliar words and actual conversational errors into a continuous, personalized practice loop. A skill is never marked as "learned" until the user successfully deploys it in a novel, dynamic context.
+## Why I'm Building FluentLoop
 
-## ✨ The FluentLoop Method (User Journey)
-1. **Curate (Active Discovery):** Users select their target CEFR level and intuitively swipe through vocabulary decks (Tinder-style). This active filtering isolates true knowledge gaps, instantly building a high-yield, personalized practice queue.
-2. **Speak (Contextual Generation):** The engine dynamically synthesizes voice-based prompts designed to seamlessly elicit the target vocabulary in real-world scenarios. Users respond via raw, unscripted speech.
-3. **Analyze (AI-Powered Diagnostics):** Audio is transcribed and semantically analyzed in real-time. The system delivers actionable, granular diagnostics on grammar integrity, vocabulary precision, and pronunciation clarity.
-4. **Adapt (Granular Error Mapping):** Mistakes aren't just highlighted; they are structurally mapped by error type (e.g., subject-verb agreement, improper tense). The system prioritizes these specific weaknesses, adapting future prompts to target exact lexical or grammatical failures.
-5. **Play (Gamified Retention):** To drive daily habit-building, the learning loop is reinforced with dynamic micro-challenges, mastery points, and progression streaks, ensuring that overcoming linguistic hurdles feels highly rewarding.
+While improving my spoken English, I kept running into two problems:
 
-## ⚙️ Engineering Highlights (Under The Hood)
-FluentLoop is architected to solve complex scheduling and data-routing challenges at scale:
+- **Expanding my active vocabulary:** I needed a way to discover words beyond the ones I already knew and learn to use them naturally in conversation.
+- **Making grammar corrections stick:** I could understand a correction and still repeat the same mistake later.
 
-* **Prerequisite-Based Skill Graph (DAG):** Models language acquisition as a Directed Acyclic Graph. If a user struggles with the "Past Perfect" node, the algorithm automatically traverses back to verify mastery of the "Past Simple" prerequisite.
-* **Algorithmic Error Triage (Priority Queue):** Not all mistakes carry the same weight. A custom priority-queue scheduler ranks recurring errors based on severity, historical frequency, and prerequisite impact, deterministically computing the optimal next-practice scenario.
-* **Context-Aware Hybrid Retrieval:** Leverages PostgreSQL (`pgvector`) for high-dimensional semantic search, dynamically fetching the most relevant, engaging conversational contexts tailored to the user’s immediate skill gaps.
-* **Asynchronous AI Pipeline:** Heavy-compute tasks like OpenAI Whisper transcription and NLP diagnostics are entirely decoupled from the main UI thread via background workers, guaranteeing a zero-latency, non-blocking user experience.
+I'm building FluentLoop to turn these challenges into a personal practice plan. The planned experience starts with vocabulary decks: learners swipe through words, filter out familiar ones, and collect unfamiliar ones for practice. These words and recurring speaking mistakes then guide contextual exercises and follow-up questions.
 
-## 🛠️ Tech Stack
-* **Frontend:** React, TypeScript, Vite (PWA architecture for a fluid, gamified UI)
-* **Backend:** Python, FastAPI (High-performance, async REST APIs)
-* **Database:** PostgreSQL with `pgvector` (Relational integrity + Vector embeddings)
-* **AI / NLP:** OpenAI Whisper, Semantic Analysis Models
-* **Infrastructure:** Docker, CI/CD Pipelines, Google Cloud Platform (GCP)
+The goal is to track whether learners can use new vocabulary and corrected grammar patterns independently, across different situations and learning sessions.
 
-## 🚀 Current Status
-- [x] System Architecture & Database Schema Design
-- [x] Initial React/Vite + FastAPI setup (Monorepo)
-- [ ] Core gamification UI (Swipe mechanics & Dashboard)
-- [ ] AI Audio processing integration
-- [ ] Skill Graph (DAG) & Priority Queue algorithms implementation
+## Current Prototype
+
+- [x] React/TypeScript frontend with Vite.
+- [x] FastAPI backend with a JSON endpoint and local CORS configuration.
+- [x] Frontend API request that displays the backend response.
+
+Explore the [frontend API request](frontend/src/App.tsx) and the [backend endpoint](backend/main.py), or follow the local setup instructions below.
+
+## Planned Learning Loop
+
+1. **Discover:** Choose a target CEFR level (A1-C2), review vocabulary cards, and separate familiar words from unfamiliar ones.
+2. **Practice:** Learn a small group of target words and optionally add a grammar pattern recommended by the system's priority queue of recurring errors. Answer a short speaking prompt that encourages use of the selected words and, when included, the grammar pattern.
+3. **Review:** Receive vocabulary and grammar feedback after each spoken response, including corrected sentences and similar examples demonstrating the correct usage or grammar pattern. Recurring errors are linked to specific skills.
+4. **Adapt:** Update practice priorities and select follow-up exercises based on the learner's errors, practice history, and prerequisite skills.
+5. **Retest:** Use the target words or grammar pattern in a different context and save the result to the learner's progress record.
+
+For example, a learner selects **"reluctant"** and **"opportunity"** for practice. The planned system introduces their meanings and asks about an opportunity the learner felt reluctant to accept. If the learner says **"I have went through this before,"** the feedback would show **"I have gone through this before"** and related examples such as **"She has written about this"** and **"We have seen this before."** Repeated errors in this pattern would raise its practice priority, allowing the system to recommend a present-perfect focus in a later session and check its use in a new context.
+
+**Design principle:** a swipe is a self-assessment; progress should reflect performance across different practice contexts.
+
+## Planned Engineering Design
+
+| Engineering challenge | Planned approach and purpose |
+| --- | --- |
+| Keep progress persistent and specific to each learner | Store users, skills, and practice attempts in PostgreSQL. Check authorization on each read and write so learners can access their own records. |
+| Decide what to practice next | Use a **priority queue** with an explicit scoring heuristic based on error frequency, severity, and prerequisite relationships to rank practice needs and recommend an optional grammar focus. |
+| Identify gaps in foundational skills | Represent curated skill dependencies as a **directed acyclic graph (DAG)** and traverse prerequisite links to select follow-up checks. |
+| Retrieve relevant practice contexts | Combine **PostgreSQL full-text search** with **`pgvector` similarity search**, filtering by CEFR level and target skill to match both wording and meaning. |
+| Keep the interface responsive during audio processing | Run transcription and feedback analysis in **background workers**, exposing processing status to the client while it waits for results. |
+
+These components are implementation targets. The next milestone below focuses on accounts and persistent progress.
+
+## Technology
+
+**In use:** React, TypeScript, Vite, Python, FastAPI.
+
+**Planned:** PostgreSQL, `pgvector`, Whisper-based transcription, and language-model feedback.
+
+**Later infrastructure milestones:** Docker, CI/CD, and deployment to Google Cloud Platform (GCP).
+
+## Run the Current Prototype
+
+Prerequisites: Node.js 24 LTS with npm, Python 3.11 or newer, and Git. The commands below are for macOS/Linux.
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/OphirAgami/FluentLoop.git
+cd FluentLoop
+```
+
+### 2. Start the backend
+
+From the repository root, in the first terminal:
+
+```bash
+cd backend
+python3 -m venv .venv
+source .venv/bin/activate
+python -m pip install fastapi uvicorn
+python -m uvicorn main:app --reload --host 127.0.0.1 --port 8000
+```
+
+API documentation: <http://localhost:8000/docs>.
+
+### 3. Start the frontend
+
+Open a second terminal at the repository root:
+
+```bash
+cd frontend
+npm ci
+npm run dev -- --port 5173 --strictPort
+```
+
+Open <http://localhost:5173>. The page should display the message returned by the FastAPI backend.
+
+## Next Milestone
+
+Build the first learning flow with saved, per-user progress:
+
+- [ ] User registration, login, and logout.
+- [ ] CEFR level selection and a small vocabulary set for initial practice.
+- [ ] Per-user vocabulary status and saved practice progress.
+- [ ] A basic progress screen.
+
+**Completion check:** two accounts retain different progress for the same word after logout and login, and requests to access another account's records are rejected.
+
+Targeted practice, adaptive scheduling, speech processing, and the remaining engineering components follow this foundation. XP, streaks, and challenges will be added after the core learning flow works.
+
+## Author
+
+[Ophir Rephael Agami](https://github.com/OphirAgami) — a personal software engineering project inspired by my own English-learning experience.
