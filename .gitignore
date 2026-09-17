@@ -1,11 +1,19 @@
-# IDE
+# macOS and editors
+.DS_Store
 .idea/
+.vscode/
 
-# Backend (Python)
-backend/venv/
-backend/__pycache__/
-backend/.env
+# Python
+.venv/
+venv/
+__pycache__/
+*.py[cod]
 
-# Frontend (React)
-frontend/node_modules/
-frontend/dist/
+# Local environment files
+.env
+.env.*
+!.env.example
+
+# Frontend build files
+node_modules/
+dist/
