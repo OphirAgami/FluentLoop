@@ -1,29 +1,39 @@
-import { useEffect, useState } from 'react'
-import './App.css'
+import { useState } from 'react'
 
-function App() {
-    // משתנה מצב (State) שישמור את ההודעה שנקבל מהשרת
-    const [message, setMessage] = useState<string>('Loading...')
+export default function App() {
+    const [message, setMessage] = useState('Ready to connect')
+    const [loading, setLoading] = useState(false)
 
-    // useEffect רץ פעם אחת ברגע שהקומפוננטה עולה למסך
-    useEffect(() => {
-        fetch('http://localhost:8000')
-            .then(response => response.json())
-            .then(data => setMessage(data.message))
-            .catch(error => console.error('Error fetching data:', error))
-    }, [])
+    async function checkConnection() {
+        setLoading(true)
+        setMessage('Checking...')
+
+        try {
+            // כאן ה"דלפק" קורא ל"עובד"
+            const response = await fetch('http://127.0.0.1:8000/health')
+            if (!response.ok) throw new Error('Server not ready')
+
+            const data = await response.json()
+            if (data.database !== 'connected') {
+                throw new Error('Database not ready')
+            }
+
+            setMessage('Database connected')
+        } catch {
+            setMessage('Connection failed. Check the server and database.')
+        } finally {
+            setLoading(false)
+        }
+    }
 
     return (
-        <div className="App">
-            <h1>Welcome to FluentLoop</h1>
-            <div className="card" style={{ padding: '2em', backgroundColor: '#1a1a1a', borderRadius: '8px' }}>
-                <h3>Message from Python Backend:</h3>
-                <p style={{ color: '#646cff', fontSize: '1.2em', fontWeight: 'bold' }}>
-                    {message}
-                </p>
-            </div>
-        </div>
+        <main>
+            <h1>FluentLoop</h1>
+            <p>A small beginning for your English practice.</p>
+            <button onClick={checkConnection} disabled={loading}>
+                {loading ? 'Checking...' : 'Check connection'}
+            </button>
+            <p role="status">{message}</p>
+        </main>
     )
 }
-
-export default App
